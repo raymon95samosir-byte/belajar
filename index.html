@@ -1,12 +1,420 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kelas Pak RY</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Persamaan Kuadrat</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+h1 {
+    text-align: center;
+    color: #5145a5;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.progress {
+    height: 10px;
+    background: #eee;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #667eea;
+    transition: 0.3s;
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #555;
+}
+
+.question {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.option {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.option:hover:not(:disabled) {
+    background: #eef0ff;
+    border-color: #667eea;
+}
+
+.option:disabled {
+    cursor: default;
+    color: #333;
+}
+
+.correct {
+    background: #d4edda !important;
+    border-color: #28a745 !important;
+}
+
+.wrong {
+    background: #f8d7da !important;
+    border-color: #dc3545 !important;
+}
+
+.feedback {
+    margin-top: 15px;
+    font-weight: bold;
+    text-align: center;
+    min-height: 25px;
+}
+
+button.next, button.restart {
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 10px;
+    background: #667eea;
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+button.next:hover, button.restart:hover {
+    background: #5145a5;
+}
+
+#result {
+    display: none;
+    text-align: center;
+}
+
+.score {
+    font-size: 55px;
+    font-weight: bold;
+    color: #667eea;
+    margin: 20px;
+}
+
+@media(max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+}
+</style>
 </head>
+
 <body>
-  <h1>Selamat datang!</h1>
-  <p>Website kelas Matematika.</p>
+
+<div class="container">
+
+    <h1>📚 Quiz Persamaan Kuadrat</h1>
+
+    <p class="subtitle">
+        Uji kemampuanmu dalam memahami persamaan kuadrat!
+    </p>
+
+    <div id="quiz">
+
+        <div class="progress">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+
+        <div class="info">
+            <span id="number">Soal 1 dari 5</span>
+            <span id="score">Skor: 0</span>
+        </div>
+
+        <div class="question" id="question"></div>
+
+        <div id="options"></div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <button class="next" id="next" onclick="nextQuestion()" disabled>
+            Soal Berikutnya →
+        </button>
+
+    </div>
+
+    <div id="result">
+        <h2>🎉 Kuis Selesai!</h2>
+        <p>Nilai akhir kamu:</p>
+        <div class="score" id="finalScore">0</div>
+        <h3 id="message"></h3>
+        <p id="detail"></p>
+        <button class="restart" onclick="restartQuiz()">
+            🔄 Ulangi Kuis
+        </button>
+    </div>
+
+</div>
+
+<script>
+
+const questions = [
+
+{
+    question: "1. Bentuk umum persamaan kuadrat adalah ...",
+    options: [
+        "A. ax + b = 0",
+        "B. ax² + bx + c = 0",
+        "C. ax³ + bx + c = 0",
+        "D. ax² + b = 0"
+    ],
+    answer: 1
+},
+
+{
+    question: "2. Akar-akar persamaan x² - 5x + 6 = 0 adalah ...",
+    options: [
+        "A. 1 dan 6",
+        "B. 2 dan 3",
+        "C. -2 dan -3",
+        "D. 3 dan 4"
+    ],
+    answer: 1
+},
+
+{
+    question: "3. Nilai diskriminan dari persamaan x² - 4x + 4 = 0 adalah ...",
+    options: [
+        "A. 0",
+        "B. 4",
+        "C. 8",
+        "D. 16"
+    ],
+    answer: 0
+},
+
+{
+    question: "4. Jika persamaan x² - 7x + 12 = 0, maka jumlah akar-akarnya adalah ...",
+    options: [
+        "A. 12",
+        "B. -12",
+        "C. 7",
+        "D. -7"
+    ],
+    answer: 2
+},
+
+{
+    question: "5. Persamaan kuadrat x² - 9 = 0 memiliki akar-akar ...",
+    options: [
+        "A. 0 dan 9",
+        "B. 3 dan -3",
+        "C. 9 dan -9",
+        "D. 3 dan 3"
+    ],
+    answer: 1
+}
+
+];
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+function showQuestion() {
+
+    answered = false;
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("number").innerText =
+        `Soal ${currentQuestion + 1} dari ${questions.length}`;
+
+    document.getElementById("score").innerText =
+        `Skor: ${score}`;
+
+    document.getElementById("question").innerText = q.question;
+
+    document.getElementById("progress").style.width =
+        ((currentQuestion) / questions.length * 100) + "%";
+
+    document.getElementById("feedback").innerText = "";
+
+    document.getElementById("next").disabled = true;
+
+    document.getElementById("next").innerText =
+        currentQuestion === questions.length - 1
+        ? "Lihat Hasil 🏆"
+        : "Soal Berikutnya →";
+
+    const optionsDiv = document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach((option, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "option";
+        button.innerText = option;
+
+        button.onclick = () => checkAnswer(index, button);
+
+        optionsDiv.appendChild(button);
+
+    });
+
+}
+
+function checkAnswer(selected, button) {
+
+    if (answered) return;
+
+    answered = true;
+
+    const correct = questions[currentQuestion].answer;
+
+    const allOptions = document.querySelectorAll(".option");
+
+    allOptions.forEach((option, index) => {
+
+        option.disabled = true;
+
+        if (index === correct) {
+            option.classList.add("correct");
+        }
+
+    });
+
+    if (selected === correct) {
+
+        score += 20;
+
+        document.getElementById("feedback").innerText =
+            "✅ Benar! Jawaban kamu tepat.";
+
+        document.getElementById("feedback").style.color = "green";
+
+    } else {
+
+        button.classList.add("wrong");
+
+        document.getElementById("feedback").innerText =
+            "❌ Kurang tepat. Jawaban yang benar adalah " +
+            questions[currentQuestion].options[correct];
+
+        document.getElementById("feedback").style.color = "red";
+
+    }
+
+    document.getElementById("score").innerText =
+        `Skor: ${score}`;
+
+    document.getElementById("next").disabled = false;
+
+}
+
+function nextQuestion() {
+
+    if (!answered) return;
+
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+
+        showQuestion();
+
+    } else {
+
+        showResult();
+
+    }
+
+}
+
+function showResult() {
+
+    document.getElementById("quiz").style.display = "none";
+
+    document.getElementById("result").style.display = "block";
+
+    document.getElementById("progress").style.width = "100%";
+
+    document.getElementById("finalScore").innerText = score;
+
+    let message = "";
+
+    if (score === 100) {
+        message = "🌟 Luar biasa! Kamu sangat hebat!";
+    } else if (score >= 80) {
+        message = "👏 Bagus sekali! Pertahankan!";
+    } else if (score >= 60) {
+        message = "👍 Bagus! Teruslah berlatih!";
+    } else {
+        message = "💪 Jangan menyerah, ayo belajar lagi!";
+    }
+
+    document.getElementById("message").innerText = message;
+
+    document.getElementById("detail").innerText =
+        `Kamu menjawab benar ${score / 20} dari 5 soal.`;
+
+}
+
+function restartQuiz() {
+
+    currentQuestion = 0;
+    score = 0;
+
+    document.getElementById("quiz").style.display = "block";
+
+    document.getElementById("result").style.display = "none";
+
+    showQuestion();
+
+}
+
+showQuestion();
+
+</script>
+
 </body>
 </html>
